@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analog Communication Visualizer Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar / Parameters -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>Analog Communication Visualizer Dashboard</h2>
+                <div class="subtitle">ELITE ACADEMIC DESIGN COMPLIANCE // COURSE CODE: EC401</div>
+            </div>
+            
+            <div class="sidebar-content">
+                <div class="section-title">PARAMETERS & MODES</div>
+                
+                <div class="scheme-selector">
+                    <div class="scheme-label">MODULATION SCHEME</div>
+                    <button class="scheme-btn active" data-scheme="am">AM (Double Sideband TC)</button>
+                    <button class="scheme-btn" data-scheme="dsbsc">DSB-SC (Suppressed Carrier)</button>
+                    <button class="scheme-btn" data-scheme="ssb">SSB (Single Sideband - USB)</button>
+                    <button class="scheme-btn" data-scheme="fm">FM (Frequency Modulated)</button>
+                    <button class="scheme-btn" data-scheme="pm">PM (Phase Modulated)</button>
+                </div>
+
+                <div class="sliders-container">
+                    <div class="control-group">
+                        <label>Carrier Amplitude (\(A_c\)) <span class="val" id="val-ac">4.0 V</span></label>
+                        <input type="range" id="slider-ac" min="1" max="10" step="0.1" value="4">
+                    </div>
+                    <div class="control-group">
+                        <label>Carrier Frequency (\(f_c\)) <span class="val" id="val-fc">40 Hz</span></label>
+                        <input type="range" id="slider-fc" min="20" max="200" step="1" value="40">
+                    </div>
+                    <div class="control-group">
+                        <label>Message Amplitude (\(A_m\)) <span class="val" id="val-am">2.0 V</span></label>
+                        <input type="range" id="slider-am" min="0" max="10" step="0.1" value="2">
+                    </div>
+                    <div class="control-group">
+                        <label>Message Frequency (\(f_m\)) <span class="val" id="val-fm">2.0 Hz</span></label>
+                        <input type="range" id="slider-fm" min="1" max="20" step="0.1" value="2">
+                    </div>
+                    <!-- FM Specific -->
+                    <div class="control-group" id="fm-controls" style="display:none;">
+                        <label>Frequency Deviation (\(\Delta f\)) <span class="val" id="val-dev">10.0 Hz</span></label>
+                        <input type="range" id="slider-dev" min="1" max="50" step="1" value="10">
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="workspace">
+            <!-- Top Charts Row -->
+            <div class="charts-row">
+                <div class="chart-panel">
+                    <div class="chart-header">
+                        <span>TIME-DOMAIN OSCILLOSCOPE (T)</span>
+                        <div class="zoom-controls">
+                            <label>X-Zoom: <input type="range" id="zoom-x" min="0.1" max="5" step="0.1" value="1"></label>
+                            <label>Y-Zoom: <input type="range" id="zoom-y" min="0.1" max="3" step="0.1" value="1"></label>
+                        </div>
+                    </div>
+                    <div class="canvas-container multi-canvas">
+                        <div class="canvas-row">
+                            <span class="sub-label" style="color: #39ff14;">Message m(t)</span>
+                            <canvas id="osc-msg"></canvas>
+                        </div>
+                        <div class="canvas-row">
+                            <span class="sub-label" style="color: #a1a1aa;">Carrier c(t)</span>
+                            <canvas id="osc-car"></canvas>
+                        </div>
+                        <div class="canvas-row">
+                            <span class="sub-label" style="color: #ff7a00;">Modulated s(t)</span>
+                            <canvas id="osc-mod"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-panel">
+                    <div class="chart-header">
+                        <span>FREQUENCY-DOMAIN SPECTRUM (F)</span>
+                    </div>
+                    <div class="canvas-container">
+                        <canvas id="spectrum-canvas"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Middle Math Row -->
+            <div class="math-panel">
+                <div class="panel-label">ACTIVE MATHEMATICAL MODEL</div>
+                <div class="math-formula" id="math-formula">
+                    <!-- Dynamic MathJax here -->
+                </div>
+                <div class="math-values" id="math-values">
+                    <!-- Substituted values here -->
+                </div>
+            </div>
+
+            <!-- Bottom Telemetry Row -->
+            <div class="telemetry-panel">
+                <div class="panel-label">ACADEMIC LABORATORY TELEMETRY DASHBOARD (EC401 STANDARDS)</div>
+                <div class="telemetry-grid">
+                    <div class="tel-box">
+                        <span class="tel-label">MODULATION STATUS</span>
+                        <span class="tel-value" id="tel-status">UNDERMODULATION</span>
+                        <span class="tel-sub" id="tel-status-sub">\(\mu < 1.0\)</span>
+                    </div>
+                    <div class="tel-box">
+                        <span class="tel-label">CARRIER POWER (\(P_c\))</span>
+                        <span class="tel-value"><span id="tel-pc">8.00</span> <span class="unit">W</span></span>
+                        <span class="tel-sub" id="tel-pc-sub">\(P_c = A_c^2 / 2\)</span>
+                    </div>
+                    <div class="tel-box">
+                        <span class="tel-label">SIDEBAND POWER (\(P_{sb}\))</span>
+                        <span class="tel-value"><span id="tel-psb">2.00</span> <span class="unit">W</span></span>
+                        <span class="tel-sub" id="tel-psb-sub">Total Sideband</span>
+                    </div>
+                    <div class="tel-box">
+                        <span class="tel-label">TOTAL POWER (\(P_T\))</span>
+                        <span class="tel-value"><span id="tel-pt">10.00</span> <span class="unit">W</span></span>
+                        <span class="tel-sub" id="tel-pt-sub">\(P_T = P_c + P_{sb}\)</span>
+                    </div>
+                    <div class="tel-box">
+                        <span class="tel-label">TRANSMISSION EFFICIENCY (\(\eta\))</span>
+                        <span class="tel-value"><span id="tel-eff">20.0</span> <span class="unit">%</span></span>
+                        <span class="tel-sub">\(P_{sb} / P_T\)</span>
+                    </div>
+                    <div class="tel-box">
+                        <span class="tel-label">BANDWIDTH (BW)</span>
+                        <span class="tel-value"><span id="tel-bw">4.00</span> <span class="unit">Hz</span></span>
+                        <span class="tel-sub" id="tel-bw-sub">\(BW = 2f_m\)</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/modules/oscilloscope.js?v=3"></script>
+    <script src="js/modules/spectrum.js?v=3"></script>
+    <script src="js/main.js?v=3"></script>
+</body>
+</html>
